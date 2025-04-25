@@ -389,10 +389,10 @@ void loop() {
 ![Image](https://github.com/user-attachments/assets/6a47ebc4-9498-4b77-8995-626b959d9652)
 
                                                 
+*Resposta através no Arduino IDE (Plataforma):*
+![Image](https://github.com/user-attachments/assets/f8f3cd9a-d84c-495f-afb6-8ceb3e3f5120)
 
-![Image](https://github.com/user-attachments/assets/dfe55b56-75d9-4d70-ae43-e421b40fc6a7)
-
-                                           *Resposta através no Arduino IDE (Plataforma):*
+                                           
 
 ---
 
