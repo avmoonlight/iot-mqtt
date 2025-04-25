@@ -385,9 +385,10 @@ void loop() {
 ```
 
 ---
-![Image](https://github.com/user-attachments/assets/6b502ca0-cac9-4fb4-82cc-9a8213a49bbc)
+*Imagem da Montagem Arduino + ESP*
+![Image](https://github.com/user-attachments/assets/6a47ebc4-9498-4b77-8995-626b959d9652)
 
-                                                *Imagem da Montagem Arduino + ESP*
+                                                
 
 ![Image](https://github.com/user-attachments/assets/dfe55b56-75d9-4d70-ae43-e421b40fc6a7)
 
