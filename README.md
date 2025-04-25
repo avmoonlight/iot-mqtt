@@ -155,121 +155,144 @@ mosquitto_pub -h [localhost](http://localhost) -t "007/chat" -m "Mensagem do bro
 ## Realizando a comunicação com outro grupo
 
 ### Código para o Sub:
+```cpp
 #include <WiFi.h>
 #include <PubSubClient.h>
+
 const char* ssid = "iot";
 const char* password = "iotsenai502";
-const char* mqtt_server = "192.168.0.175";  // IP da Raspberry Pi
+const char* mqtt_server = "192.168.0.175"; // IP da Raspberry Pi
+
 WiFiClient espClient;
 PubSubClient client(espClient);
+
 #define LED_PIN 4
+
 void setup_wifi() {
-delay(10);
-Serial.println("Conectando ao WiFi...");
-WiFi.begin(ssid, password);
-while (WiFi.status() != WL_CONNECTED) {
-delay(500);
-Serial.print(".");
-}
-Serial.println("\nConectado ao WiFi");
-}
-void callback(char* topic, byte* payload, unsigned int length) {
-Serial.print("Mensagem recebida em [");
-Serial.print(topic);
-Serial.print("]: ");
-String mensagem;
-for (int i = 0; i < length; i++) {
-mensagem += (char)payload[i];
-}
-Serial.println(mensagem);
-if (mensagem == "ligar_led") {
-digitalWrite(LED_PIN, HIGH);
-Serial.println("LED LIGADO");
-delay(1000);  // Acende por 1 segundo
-digitalWrite(LED_PIN, LOW);
-Serial.println("LED DESLIGADO");
-}
-}
-void reconnect() {
-while (!client.connected()) {
-Serial.print("Tentando conectar ao MQTT...");
-if (client.connect("ESP32Sub")) {
-Serial.println("Conectado ao broker MQTT");
-client.subscribe("grupo7/chat");
-} else {
-Serial.print("Falhou, rc=");
-Serial.print(client.state());
-Serial.println(" tentando novamente em 1 segundo");
-delay(1000);
-}
-}
-}
-void setup() {
-pinMode(LED_PIN, OUTPUT);
-Serial.begin(115200);
-setup_wifi();
-client.setServer(mqtt_server, 1883);
-client.setCallback(callback);
-}
-void loop() {
-if (!client.connected()) {
-reconnect();
-}
-client.loop();
+  delay(10);
+  Serial.println("Conectando ao WiFi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConectado ao WiFi");
 }
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Mensagem recebida em [");
+  Serial.print(topic);
+  Serial.print("]: ");
+
+  String mensagem;
+  for (int i = 0; i < length; i++) {
+    mensagem += (char)payload[i];
+  }
+  Serial.println(mensagem);
+
+  if (mensagem == "ligar_led") {
+    digitalWrite(LED_PIN, HIGH);
+    Serial.println("LED LIGADO");
+    delay(1000); // Acende por 1 segundo
+    digitalWrite(LED_PIN, LOW);
+    Serial.println("LED DESLIGADO");
+  }
+}
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("Tentando conectar ao MQTT...");
+    if (client.connect("ESP32Sub")) {
+      Serial.println("Conectado ao broker MQTT");
+      client.subscribe("grupo7/chat");
+    } else {
+      Serial.print("Falhou, rc=");
+      Serial.print(client.state());
+      Serial.println(" tentando novamente em 1 segundo");
+      delay(1000);
+    }
+  }
+}
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(115200);
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+}
+
+void loop() {
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+}
+`
+
+
 ### Código para o Pub:
+```cpp
 #include <WiFi.h>
 #include <PubSubClient.h>
+
 // Wi-Fi
 const char* ssid = "iot";
 const char* password = "iotsenai502";
+
 // MQTT Broker
 const char* mqtt_server = "192.168.0.175";  // IP da Raspberry Pi
+
 WiFiClient espClient;
 PubSubClient client(espClient);
+
 void setup_wifi() {
-delay(10);
-Serial.println("Conectando ao WiFi...");
-WiFi.begin(ssid, password);
-while (WiFi.status() != WL_CONNECTED) {
-delay(500);
-Serial.print(".");
+  delay(10);
+  Serial.println("Conectando ao WiFi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConectado ao WiFi");
 }
-Serial.println("\nConectado ao WiFi");
-}
+
 void reconnect() {
-while (!client.connected()) {
-Serial.print("Tentando conectar ao MQTT...");
-if (client.connect("ESP32Pub")) {
-Serial.println("Conectado ao broker MQTT");
-} else {
-Serial.print("Falhou, rc=");
-Serial.print(client.state());
-Serial.println(" tentando novamente em 1 segundo");
-delay(1000);
+  while (!client.connected()) {
+    Serial.print("Tentando conectar ao MQTT...");
+    if (client.connect("ESP32Pub")) {
+      Serial.println("Conectado ao broker MQTT");
+    } else {
+      Serial.print("Falhou, rc=");
+      Serial.print(client.state());
+      Serial.println(" tentando novamente em 1 segundo");
+      delay(1000);
+    }
+  }
 }
-}
-}
+
 void setup() {
-Serial.begin(115200);
-setup_wifi();
-client.setServer(mqtt_server, 1883);
+  Serial.begin(115200);
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
 }
+
 void loop() {
-if (!client.connected()) {
-reconnect();
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  static unsigned long lastMsg = 0;
+  if (millis() - lastMsg > 5000) {
+    lastMsg = millis();
+    String msg = "ligar_led"; // Comando a ser enviado
+    client.publish("grupo7/chat", msg.c_str());
+    Serial.println("Mensagem publicada: ligar_led");
+  }
 }
-client.loop();
-static unsigned long lastMsg = 0;
-if (millis() - lastMsg > 5000) {
-lastMsg = millis();
-String msg = "ligar_led"; // Comando a ser enviado
-client.publish("grupo7/chat", msg.c_str());
-Serial.println("Mensagem publicada: ligar_led");
-}
-}
-### Código para a comunicação simultânea:
+
+
 #include <WiFi.h>
 #include <PubSubClient.h>
 
@@ -360,6 +383,8 @@ void loop() {
     }
   }
 }
+```
+
 
 --------------------------------------------------------------------------
 
