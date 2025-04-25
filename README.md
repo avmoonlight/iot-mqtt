@@ -291,7 +291,7 @@ Serial.println("Mensagem publicada: ligar_led");
 
 ### Código para comunicação simultânea
 
-```bash
+```powershell
 #include <WiFi.h>
 #include <PubSubClient.h>
 
